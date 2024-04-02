@@ -12,6 +12,11 @@ class _PostsBuilderState extends State<PostsBuilder> {
   List<dynamic> _posts = [];
   bool _isLoaded = false;
 
+  @override
+  void initState() {
+    super.initState();
+    getPosts();
+  }
   Future<void> getPosts() async {
     setState(() {
       _isLoaded = true;
@@ -31,9 +36,25 @@ class _PostsBuilderState extends State<PostsBuilder> {
       print('Error fetching posts: $e');
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Posts'),
+      ),
+      body: _isLoaded
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: _posts.length,
+              itemBuilder: (context, index) {
+                final post = _posts[index];
+                return ListTile(
+                  title: Text(post['title']),
+                  subtitle: Text(post['body']),
+                );
+              },
+            ),
+    );
   }
 }
