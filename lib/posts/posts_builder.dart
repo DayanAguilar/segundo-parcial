@@ -48,12 +48,12 @@ class _PostsBuilderState extends State<PostsBuilder> {
     });
   }
 
- List<Map<String, dynamic>> getPostsByRating(double minRating) {
-  List<Map<String, dynamic>> filteredPosts = _posts;
-  filteredPosts.sort((a, b) => b['rating'].compareTo(a['rating'])); // Ordena de mayor a menor calificación
-  return filteredPosts;
-}
-
+  List<Map<String, dynamic>> getPostsByRating(double minRating) {
+    List<Map<String, dynamic>> filteredPosts = _posts;
+    filteredPosts.sort((a, b) => b['rating']
+        .compareTo(a['rating'])); // Ordena de mayor a menor calificación
+    return filteredPosts;
+  }
 
   @override
   Widget build(BuildContext context) {
