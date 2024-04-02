@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart'; // Importa el paquete de rating bar
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class PostsBuilder extends StatefulWidget {
   const PostsBuilder({Key? key});
@@ -10,8 +10,9 @@ class PostsBuilder extends StatefulWidget {
 }
 
 class _PostsBuilderState extends State<PostsBuilder> {
-  List<dynamic> _posts = [];
+  List<Map<String, dynamic>> _posts = [];
   bool _isLoaded = false;
+  double _minRating = 0;
 
   @override
   void initState() {
@@ -28,7 +29,9 @@ class _PostsBuilderState extends State<PostsBuilder> {
       final response =
           await Dio().get('https://jsonplaceholder.typicode.com/posts');
       setState(() {
-        _posts = List.from(response.data);
+        _posts = List<Map<String, dynamic>>.from(response.data)
+            .map((post) => {'post': post, 'rating': 0.0})
+            .toList();
         _isLoaded = false;
       });
     } catch (e) {
@@ -39,6 +42,19 @@ class _PostsBuilderState extends State<PostsBuilder> {
     }
   }
 
+  void updateRating(int index, double rating) {
+    setState(() {
+      _posts[index]['rating'] = rating;
+    });
+  }
+
+ List<Map<String, dynamic>> getPostsByRating(double minRating) {
+  List<Map<String, dynamic>> filteredPosts = _posts;
+  filteredPosts.sort((a, b) => b['rating'].compareTo(a['rating'])); // Ordena de mayor a menor calificación
+  return filteredPosts;
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,26 +64,25 @@ class _PostsBuilderState extends State<PostsBuilder> {
       body: _isLoaded
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(
-              itemCount: _posts.length,
+              itemCount: getPostsByRating(_minRating).length,
               itemBuilder: (context, index) {
-                final post = _posts[index];
+                final post = getPostsByRating(_minRating)[index];
                 return ListTile(
-                  title: Text(post['title']),
-                  subtitle: Text(post['body']),
+                  title: Text(post['post']['title']),
+                  subtitle: Text(post['post']['body']),
                   trailing: RatingBar.builder(
-                    initialRating: 0,
-                    minRating: 1,
+                    initialRating: post['rating'],
+                    minRating: 0,
                     direction: Axis.horizontal,
                     allowHalfRating: false,
                     itemCount: 5,
                     itemSize: 20,
                     itemBuilder: (context, _) => Icon(
                       Icons.star,
-                      color: Colors.yellow,
+                      color: Colors.amber,
                     ),
                     onRatingUpdate: (rating) {
-                      // Aquí puedes manejar la calificación del post
-                      print('Calificación del post ${post['id']}: $rating');
+                      updateRating(index, rating);
                     },
                   ),
                 );
