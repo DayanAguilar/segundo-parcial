@@ -16,7 +16,7 @@ class PostsCubit extends Cubit<PostsState> {
       emit(PostsSuccesful(posts: posts, isLoading: false));
     } catch (e) {
       print('Error fetching posts: $e');
-      emit(PostsSuccesful(posts: [], isLoading: false));
+      
     }
   }
 
@@ -25,12 +25,14 @@ class PostsCubit extends Cubit<PostsState> {
     final List<Map<String, dynamic>> updatedPosts = List<Map<String, dynamic>>.from(currentState.posts);
     updatedPosts[index]['rating'] = rating;
     emit(currentState.copyWith(posts: updatedPosts));
+    getPostsByRating();
   }
 
-  List<Map<String, dynamic>> getPostsByRating(double minRating) {
+  List<Map<String, dynamic>> getPostsByRating() {
     final currentState = state as PostsSuccesful;
-    List<Map<String, dynamic>> filteredPosts = currentState.posts.where((post) => post['rating'] >= minRating).toList();
+    List<Map<String, dynamic>> filteredPosts = currentState.posts;
     filteredPosts.sort((a, b) => b['rating'].compareTo(a['rating']));
+    emit(currentState.copyWith(posts: filteredPosts));
     return filteredPosts;
   }
 }
