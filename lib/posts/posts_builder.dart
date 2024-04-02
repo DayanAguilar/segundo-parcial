@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart'; // Importa el paquete de rating bar
 
 class PostsBuilder extends StatefulWidget {
-  const PostsBuilder({super.key});
+  const PostsBuilder({Key? key});
 
   @override
   State<PostsBuilder> createState() => _PostsBuilderState();
@@ -17,6 +18,7 @@ class _PostsBuilderState extends State<PostsBuilder> {
     super.initState();
     getPosts();
   }
+
   Future<void> getPosts() async {
     setState(() {
       _isLoaded = true;
@@ -52,6 +54,22 @@ class _PostsBuilderState extends State<PostsBuilder> {
                 return ListTile(
                   title: Text(post['title']),
                   subtitle: Text(post['body']),
+                  trailing: RatingBar.builder(
+                    initialRating: 0,
+                    minRating: 1,
+                    direction: Axis.horizontal,
+                    allowHalfRating: false,
+                    itemCount: 5,
+                    itemSize: 20,
+                    itemBuilder: (context, _) => Icon(
+                      Icons.star,
+                      color: Colors.yellow,
+                    ),
+                    onRatingUpdate: (rating) {
+                      // Aquí puedes manejar la calificación del post
+                      print('Calificación del post ${post['id']}: $rating');
+                    },
+                  ),
                 );
               },
             ),
